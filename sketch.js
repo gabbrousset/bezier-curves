@@ -1,35 +1,25 @@
 let WIDTH, HEIGHT;
-let p_init, p_last, freeze, density, step, t, scaleN;
-let points = [];
+let mouse_point, points;
+let density, step, t;
 
 function setup() {
     WIDTH = 1512;
     HEIGHT = 831;
     createCanvas(WIDTH, HEIGHT);
-    p_init = createVector(WIDTH / 2, 50);
-    p_last = createVector(WIDTH / 2, HEIGHT - 50);
-    p_0 = createVector(200, 200);
-    points = [p_init, p_last];
-    freeze = 1;
     step = 1;
-    scaleN = 1;
-    density = 100 / scaleN;
+    density = 100;
+    mouse_point = createVector(WIDTH / 2, HEIGHT / 2);
+    points = [mouse_point];
 }
 
 function draw() {
     background(0);
     noFill();
-    scale(scaleN);
     stroke(255);
     strokeWeight(8);
 
-    if (points.length > 2) {
-        removePoint(-2);
-        const p_m = createVector(WIDTH / 2, HEIGHT / 2);
-        p_m.x = mouseX / scaleN;
-        p_m.y = mouseY / scaleN;
-        addPoint(p_m);
-    }
+    mouse_point.x = mouseX;
+    mouse_point.y = mouseY;
 
     points.forEach((p) => point(p.x, p.y));
 
@@ -39,6 +29,10 @@ function draw() {
 }
 
 function linearInterpolation(points, t) {
+    if (points.length < 2) {
+        return;
+    }
+
     const [p0, p1] = points;
     const x = lerp(p0.x, p1.x, t);
     const y = lerp(p0.y, p1.y, t);
@@ -48,7 +42,6 @@ function linearInterpolation(points, t) {
 
 function interpolate(points, t) {
     if (points.length < 3) {
-        console.log(points);
         return linearInterpolation(points, t);
     }
     return interpolate(
@@ -68,16 +61,16 @@ function bezierRecursive(points) {
 }
 
 function mouseClicked() {
-    const newPoint = createPoint(1000, 200);
-    addPoint(newPoint);
+    const newPoint = createPoint(mouseX, mouseY);
+    addPoint(newPoint, -1);
 }
 
 function createPoint(x = WIDTH / 2, y = HEIGHT / 2) {
     return createVector(x, y);
 }
 
-function addPoint(point) {
-    points.splice(-1, 0, point);
+function addPoint(point, idx = months.length) {
+    points.splice(idx, 0, point);
 }
 
 function removePoint(idx) {
